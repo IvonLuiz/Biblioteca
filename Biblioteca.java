@@ -2,20 +2,25 @@ package Biblioteca;
 
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class Biblioteca {
 	
 	private static Biblioteca uniqueInstance;
     private List<Livro> livros;
     private Map<String, Usuario> usuarios;
-    private Map<String, Livro> reservas;
+    private Map<String, ArrayList<Livro>> reservas;
+    Map<String, ArrayList<Livro>> emprestimos; 
 
+    
     private Biblioteca() {
         this.livros = new ArrayList<>();
         this.usuarios = new HashMap<>();
-        this.reservas = new HashMap<>();
+        this.reservas = new HashMap<String, ArrayList<Livro>>();
+        this.emprestimos = new HashMap<String, ArrayList<Livro>>();
     }
 
     public static Biblioteca getInstancia() {
@@ -34,14 +39,21 @@ public class Biblioteca {
     }
     
     public void adicionarUsuario(Usuario usuario) {
-        usuarios.put(usuario.getCodigo(), usuario);
+    	String codigo = usuario.getCodigo();
+    	usuarios.put(codigo, usuario);
+        emprestimos.put(codigo, new ArrayList<Livro>());
+        reservas.put(codigo, new ArrayList<Livro>());
     }
 
     public void removerUsuario(Usuario usuario) {
-        usuarios.remove(usuario.getCodigo());
+        String codigo = usuario.getCodigo();
+    	usuarios.remove(codigo);
+        emprestimos.remove(codigo);
+        reservas.remove(codigo);
     }
     
     
+    // Buscas
     public List<Livro> buscarLivrosDisponiveis() {
         List<Livro> livrosDisponiveis = new ArrayList<>();
         for (Livro livro : livros) {
@@ -65,7 +77,7 @@ public class Biblioteca {
     	return usuarios.get(codigoUsuario);
     }
 
-    
+
     // Reserva
     public void realizarReserva(String codigoUsuario, String codigoLivro) {
         Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
@@ -79,8 +91,10 @@ public class Biblioteca {
         
         // Verifica disponibilidade do livro
         if (livro.getQuantidadeDisponivel() > 0) {
+        	
         	livro.reduzirQuantidadeDisponivel();
-            reservas.put(usuario.getCodigo(), livro);
+        	reservas.get(codigoUsuario).add(livro);
+            
             System.out.println("Reserva realizada com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
         } else {
             System.out.println("Não foi possível realizar a reserva. Livro indisponível: " + livro.getTitulo());
@@ -88,7 +102,7 @@ public class Biblioteca {
     }
     
     
-    public void desfazerReserva(String codigoLivro) {
+    public void desfazerReserva(String codigoUsuario, String codigoLivro) {
         Livro livro = buscarLivroPorCodigo(codigoLivro);
 
         if (livro == null) {
@@ -96,33 +110,78 @@ public class Biblioteca {
             return;
         }
 
-        reservas.remove(codigoLivro);
-        System.out.println("Reserva desfeita: " + livro.getTitulo());
+        reservas.get(codigoUsuario).remove(livro);
+        livro.incrementarQuantidadeDisponivel();
+
+        System.out.println("Reserva desfeita: " + codigoUsuario + " -> " + livro.getTitulo());        
     }
     
     
+    
+    
     // Empréstimo
-     public boolean realizarEmprestimo(String codigoUsuario, String codigoLivro) {
+     public void realizarEmprestimo(String codigoUsuario, String codigoLivro) {
          Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
          Livro livro = buscarLivroPorCodigo(codigoLivro);
 
          if (usuario == null || livro == null) {
              System.out.println("Usuário ou livro não encontrado.");
-             return false;
          }
+         
+         // Verificar se usuario atingiu o limite de emprestimo
+         if (usuario.atingiuLimiteEmprestimos() == true) {
+             System.out.println("Não foi possível realizar o empréstimo pois limite de empréstimos atingido.");
+             return;
+         }
+         
+         
+         // Verificar se o usuario tem atraso para devolucao
+         if (usuario.verificarAtrasoDevolucao()) {
+        	 System.out.println("Não foi possível realizar o empréstimo. Usuário " + codigoUsuario + " está atraso em uma devolução.");
+        	 return;
+         }
+         
+    	 // Verificar se usuario tem empréstimo daquele mesmo livro
+    	 for (int i = 0; i < emprestimos.get(codigoUsuario).size(); i++) {
+        	 if(emprestimos.get(codigoUsuario).get(i) == livro) {
+        		 System.out.println("Não foi possível realizar o empréstimo. Usuário já possui um exemplar.");
+        		 return;
+        	 }
+    	 }
 
-         if (livro.getQuantidadeDisponivel() > 0) {
-             livro.reduzirQuantidadeDisponivel();
-             reservas.remove(codigoLivro); // Remover reserva, se existir
-             System.out.println("Empréstimo realizado com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
-             return true;
-         } else {
-             System.out.println("Não foi possível realizar o empréstimo. Livro indisponível: " + livro.getTitulo());
-             return false;
-         }
+    	 boolean tinhaReserva = false;
+    	 // Verificar se o usuário tem uma reserva para o livro
+         for (int i = 0; i < reservas.get(codigoUsuario).size(); i++) {
+        	 if(reservas.get(codigoUsuario).get(i) == livro) {
+        		 desfazerReserva(codigoUsuario, codigoLivro);// Remover reserva, se existir
+        		 tinhaReserva = true;
+        	 }
+    	 }
+         
+         // Verificar quantidade disponivel
+    	 if (livro.getQuantidadeDisponivel() <= 0 && tinhaReserva==false) {  
+    		 System.out.println("Não foi possível realizar o empréstimo. Livro indisponível: " + livro.getTitulo());
+    	     return;
+    	 }
+    	 
+
+
+    	 // Realizar Emprestimo
+    	 emprestimos.get(codigoUsuario).add(livro);
+         livro.reduzirQuantidadeDisponivel();
+         
+         // Calcular data de devolucao
+         LocalDate dataDevolucao = LocalDate.now().plusDays(usuario.getDiasEmprestimo());
+         usuario.setDataDevolucao(dataDevolucao);
+         usuario.incrementarQuantLivrosEmprestados();
+         
+         System.out.println("Empréstimo realizado com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
+         System.out.println("Data de devolução: " + dataDevolucao);
      }
+         
+         
      
-    
+    /*
      public void desfazerEmprestimo(String codigoUsuario, String codigoLivro) {
          Livro livro = buscarLivroPorCodigo(codigoLivro);
          Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
@@ -133,25 +192,37 @@ public class Biblioteca {
          }
 
          livro.incrementarQuantidadeDisponivel();
+         usuario.decrementarQuantLivrosEmprestados();
          System.out.println("Empréstimo desfeito: " + usuario.getNome() + " -> " + livro.getTitulo());
      }
 
-     
+     */
 
-     
-     public void realizarDevolucao(String codigoLivro) {
+     // Devolucao
+     public void realizarDevolucao(String codigoUsuario, String codigoLivro) {
          Livro livro = buscarLivroPorCodigo(codigoLivro);
-
-         if (livro == null) {
-             System.out.println("Livro não encontrado.");
+         Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
+         
+         if (usuario == null || livro == null) {
+             System.out.println("Usuário ou livro não encontrado.");
              return;
          }
+         
+         livro.incrementarQuantidadeDisponivel();
+         usuario.decrementarQuantLivrosEmprestados();
+         
+         emprestimos.get(codigoUsuario).remove(livro);
 
-         livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() + 1);
-         System.out.println("Devolução realizada com sucesso: " + livro.getTitulo());
+         System.out.println("Devolução de " + usuario.getNome() + " realizada com sucesso: " + livro.getTitulo());
      }
 
     
-
+     private boolean verificarEntradas(Livro livro, Usuario usuario) {
+         if (usuario == null || livro == null) {
+             System.out.println("Usuário ou livro não encontrado.");
+             return false;
+         }
+         return true;
+     }
 
  }

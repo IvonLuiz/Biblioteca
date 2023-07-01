@@ -18,7 +18,7 @@ public class RealizarEmprestimo implements Comando{
 	}
 	
     public void undo() {
-        biblioteca.desfazerReserva(codigoLivro);
+        biblioteca.desfazerReserva(codigoUsuario, codigoLivro);
     }
 
 }

@@ -14,7 +14,7 @@ public class Sistema {
         this.biblioteca = Biblioteca.getInstancia();
     }
 	
-	public static Sistema getInstance() {
+	public static Sistema getInstancia() {
         if (instance == null) {
             synchronized (Sistema.class) {
                 if (instance == null) {
@@ -52,8 +52,8 @@ public class Sistema {
         comando.executar();
     }
     
-    public void realizarDevolucao(String codigoLivro) {
-        Comando comando = new RealizarDevolucao(codigoLivro);
+    public void realizarDevolucao(String codigoUsuario, String codigoLivro) {
+        Comando comando = new RealizarDevolucao(codigoUsuario, codigoLivro);
         comandos.put("realizarDevolucao", comando);
         comando.executar();
     }
@@ -76,4 +76,21 @@ public class Sistema {
         }
     }
 
+	public static void lerComando(String input) {
+		String[] entrada = input.split(" ");
+		
+		switch(entrada[0]) {
+		case "emp":
+			Sistema.getInstancia().realizarEmprestimo(entrada[1], entrada[2]);
+			break;
+		case "dev":
+			Sistema.getInstancia().realizarDevolucao(entrada[1], entrada[2]);
+			break;
+		case "res":
+			Sistema.getInstancia().realizarReserva(entrada[1], entrada[2]);
+			break;
+		default:
+			System.out.println("Comando não identificado.");
+		}
+	}
 }
