@@ -47,10 +47,12 @@ public class main {
         //sistema.realizarEmprestimo("123", "100");
  
         
-        sistema.realizarEmprestimo("101", "100");
-        sistema.realizarEmprestimo("100", "100");
-        sistema.realizarReserva("101", "100");
-
+        sistema.realizarReserva("123", "100");
+        sistema.realizarReserva("123", "101");
+        sistema.realizarReserva("123", "101");
+        sistema.realizarReserva("123", "200");
+        sistema.realizarReserva("123", "200");
+        sistema.realizarReserva("123", "300");
         
         /*
         sistema.realizarReserva("456", "100");

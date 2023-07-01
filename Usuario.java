@@ -6,16 +6,22 @@ public class Usuario {
     private String codigo;
     private String nome;
     private LocalDate dataDevolucao;
-	private int limiteEmprestimo;
     private int quantLivrosEmprestados;
+    private int quantLivrosReservados;
+	private int limiteEmprestimo;
+	private int limiteReservas;
     private int diasEmprestimo;
+    private boolean passeLivreEmprestimo;
     
     public Usuario(String codigo, String nome) {
         this.codigo = codigo;
         this.nome = nome;
         this.quantLivrosEmprestados = 0;
+        this.quantLivrosReservados = 0;
         this.limiteEmprestimo = Integer.MAX_VALUE;
+        this.limiteReservas = 3;
         this.diasEmprestimo = 7;
+        this.setPasseLivreEmprestimo(false);
     }
 
     @Override
@@ -37,10 +43,10 @@ public class Usuario {
     }
     
     
+    
     public boolean atingiuLimiteEmprestimos() {
         return quantLivrosEmprestados >= limiteEmprestimo;
     }
-    
     
     public void incrementarQuantLivrosEmprestados() {
     	quantLivrosEmprestados++;
@@ -48,6 +54,20 @@ public class Usuario {
 
     public void decrementarQuantLivrosEmprestados() {
     	quantLivrosEmprestados--;
+    }
+
+
+    
+    public boolean atingiuLimiteReservas() {
+        return quantLivrosReservados >= limiteReservas;
+    }
+    
+    public void incrementarQuantLivrosReservados() {
+    	quantLivrosReservados++;
+    }
+
+    public void decrementarQuantLivrosReservados() {
+    	quantLivrosReservados--;
     }
     
     
@@ -70,13 +90,9 @@ public class Usuario {
 	}
 	
 	
-	public void setQuantLivrosEmprestados(int quantLivrosEmprestados) {
-		this.quantLivrosEmprestados = quantLivrosEmprestados;
-	}
+
+
 	
-	public int getQuantLivrosEmprestados() {
-		return quantLivrosEmprestados;
-	}
 	
 	public void setLimiteEmprestimos(int limiteEmprestimo) {
         this.limiteEmprestimo = limiteEmprestimo;
@@ -92,5 +108,15 @@ public class Usuario {
 
 	public void setDiasEmprestimo(int diasEmprestimo) {
 		this.diasEmprestimo = diasEmprestimo;
+	}
+
+	
+	
+	public boolean isPasseLivreEmprestimo() {
+		return passeLivreEmprestimo;
+	}
+
+	public void setPasseLivreEmprestimo(boolean passeLivreEmprestimo) {
+		this.passeLivreEmprestimo = passeLivreEmprestimo;
 	}
 }

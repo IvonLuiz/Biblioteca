@@ -88,7 +88,14 @@ public class Biblioteca {
     
 
     
-
+    private Livro buscarReservaPorCodigo(String codigoUsuario, String codigoLivro) {
+        for (Livro livro : reservas.get(codigoUsuario)) {
+            if (livro.getCodigo().equals(codigoLivro)) {
+                return livro;
+            }
+        }
+        return null;
+	}
     
     
     // Reserva
@@ -102,10 +109,29 @@ public class Biblioteca {
             return;
         }
         
+        // Verifica se usuario já possui limite de reservas
+        if (usuario.atingiuLimiteReservas()) {
+        	System.out.println("Não foi possível realizar a reserva. Usuario atingiu limite de reservas.");
+            return;
+        }
+        
+        // Verifica se os parametros sao nulos
+        if (buscarEmprestimoPorCodigo(codigoUsuario, codigoLivro) == livro) {
+            System.out.println("Não foi possível realizar a reserva. Usuario " + usuario.getNome() + "ja possui exemplar de " + livro.getTitulo());
+            return;
+        }
+        
+        if (buscarReservaPorCodigo(codigoUsuario, codigoLivro) == livro) {
+        	System.out.println("Não foi possível realizar a reserva. Usuario " + usuario.getNome() + "ja possui uma reserva de " + livro.getTitulo());
+            return;
+        }
+        
         // Verifica disponibilidade do livro
         if (livro.getQuantidadeDisponivel() > 0) {
         	
-        	livro.reduzirQuantidadeDisponivel();
+        	livro.incrementarQuantidadeReservas();
+        	usuario.incrementarQuantLivrosReservados();
+        	System.out.println(livro.getQuantidadeReservas());
         	reservas.get(codigoUsuario).add(livro);
             
             System.out.println("Reserva realizada com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
@@ -114,8 +140,9 @@ public class Biblioteca {
         }
     }
     
-    
-    public void desfazerReserva(String codigoUsuario, String codigoLivro) {
+
+
+	public void desfazerReserva(String codigoUsuario, String codigoLivro) {
         Livro livro = buscarLivroPorCodigo(codigoLivro);
 
         if (livro == null) {
@@ -124,8 +151,8 @@ public class Biblioteca {
         }
 
         reservas.get(codigoUsuario).remove(livro);
-        livro.incrementarQuantidadeDisponivel();
-
+        livro.reduzirQuantidadeReservas();;
+        System.out.println(livro.getQuantidadeReservas());
         System.out.println("Reserva desfeita: " + codigoUsuario + " -> " + livro.getTitulo());        
     }
     
@@ -136,7 +163,9 @@ public class Biblioteca {
      public void realizarEmprestimo(String codigoUsuario, String codigoLivro) {
          Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
          Livro livro = buscarLivroPorCodigo(codigoLivro);
-
+         //System.out.println("Quantiadde do livro disponivel:" +  livro.getQuantidadeDisponivel());
+         
+         
          if (usuario == null || livro == null) {
              System.out.println("Usuário ou livro não encontrado.");
              return;
@@ -163,7 +192,15 @@ public class Biblioteca {
         	 }
     	 }
 
-    	 boolean tinhaReserva = false;
+         
+         // Verificar quantidade disponivel
+    	 if (livro.getQuantidadeDisponivel() == 0) {
+    		 System.out.println("Não foi possível realizar o empréstimo. Livro indisponível: " + livro.getTitulo());
+    	     return;
+    	 }
+    	 
+    	 
+         boolean tinhaReserva = false;
     	 // Verificar se o usuário tem uma reserva para o livro
          for (int i = 0; i < reservas.get(codigoUsuario).size(); i++) {
         	 if(reservas.get(codigoUsuario).get(i) == livro) {
@@ -172,15 +209,33 @@ public class Biblioteca {
         	 }
     	 }
          
-         // Verificar quantidade disponivel
-    	 if (livro.getQuantidadeDisponivel() <= 0 && tinhaReserva==false) {  
+         
+         // Verifica se o usuario tem passe livre (no momento: somente professor)
+         if (livro.getQuantidadeDisponivel() <= livro.getQuantidadeReservas() && usuario.isPasseLivreEmprestimo()) {
+        	 System.out.println("Usuario com passe livre detectado.");
+        	 emprestar(codigoUsuario, codigoLivro, livro, usuario);
+        	 return;
+         }
+    	 
+         
+
+         // Verifica se usuario tem reserva
+    	 if (livro.getQuantidadeDisponivel() <= livro.getQuantidadeReservas() && tinhaReserva==false) {  
     		 System.out.println("Não foi possível realizar o empréstimo. Livro indisponível: " + livro.getTitulo());
     	     return;
     	 }
     	 
-
+    	 
+    	 
+    	 
+    	 // Verificar se for um professor e tiver quantidade disponivel mas reservada
 
     	 // Realizar Emprestimo
+    	 emprestar(codigoUsuario, codigoLivro, livro, usuario);
+     }
+         
+         
+     private void emprestar(String codigoUsuario, String codigoLivro, Livro livro, Usuario usuario) {
     	 emprestimos.get(codigoUsuario).add(livro);
          livro.reduzirQuantidadeDisponivel();
          
@@ -192,9 +247,6 @@ public class Biblioteca {
          System.out.println("Empréstimo realizado com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
          System.out.println("Data de devolução: " + dataDevolucao);
      }
-         
-         
-     
     /*
      public void desfazerEmprestimo(String codigoUsuario, String codigoLivro) {
          Livro livro = buscarLivroPorCodigo(codigoLivro);

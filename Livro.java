@@ -20,6 +20,7 @@ public class Livro {
         this.edicao = edicao;
         this.anoPublicacao = anoPublicacao;
         this.quantidadeDisponivel = quantidadeDisponivel;
+        this.quantidadeReservas = 0;
     }
 	
 	public String printDados() {
@@ -71,11 +72,11 @@ public class Livro {
 	}
 	
 	public void incrementarQuantidadeReservas() {
-        this.setQuantidadeReservas(this.getQuantidadeDisponivel() + 1);
+        this.setQuantidadeReservas(this.getQuantidadeReservas() + 1);
 	}
 	
 	public void reduzirQuantidadeReservas() {
-        this.setQuantidadeReservas(this.getQuantidadeDisponivel() - 1);
+        this.setQuantidadeReservas(this.getQuantidadeReservas() - 1);
 	}
 }
 
