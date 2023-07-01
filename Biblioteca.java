@@ -77,7 +77,20 @@ public class Biblioteca {
     	return usuarios.get(codigoUsuario);
     }
 
+    private Livro buscarEmprestimoPorCodigo(String codigoUsuario, String codigoLivro) {
+        for (Livro livro : emprestimos.get(codigoUsuario)) {
+            if (livro.getCodigo().equals(codigoLivro)) {
+                return livro;
+            }
+        }
+        return null;
+    }
+    
 
+    
+
+    
+    
     // Reserva
     public void realizarReserva(String codigoUsuario, String codigoLivro) {
         Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
@@ -126,6 +139,7 @@ public class Biblioteca {
 
          if (usuario == null || livro == null) {
              System.out.println("Usuário ou livro não encontrado.");
+             return;
          }
          
          // Verificar se usuario atingiu o limite de emprestimo
@@ -207,6 +221,12 @@ public class Biblioteca {
              System.out.println("Usuário ou livro não encontrado.");
              return;
          }
+         
+         if (!(buscarEmprestimoPorCodigo(codigoUsuario, codigoLivro) == livro)) {
+        	 System.out.println("Usuário não possui empréstimo para determinado livro.");
+        	 return;
+         }
+         
          
          livro.incrementarQuantidadeDisponivel();
          usuario.decrementarQuantLivrosEmprestados();

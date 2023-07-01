@@ -10,6 +10,7 @@ public class Livro {
 	private int edicao;
 	private int anoPublicacao;
 	private int quantidadeDisponivel;
+	private int quantidadeReservas;
 	
 	public Livro(String codigo, String titulo, String editora, List<String> autores, int edicao, int anoPublicacao, int quantidadeDisponivel) {
         this.codigo = codigo;
@@ -32,6 +33,7 @@ public class Livro {
                 '}';
     }
 
+	
 	public String getCodigo() {
 		return codigo;
 	}
@@ -40,6 +42,8 @@ public class Livro {
 		return titulo;
 	}
 
+	
+	
 	public void setQuantidadeDisponivel(int quantidadeDisponivel) {
 		this.quantidadeDisponivel = quantidadeDisponivel;
 	}
@@ -57,5 +61,21 @@ public class Livro {
 	}
 	
 	
+	
+	public int getQuantidadeReservas() {
+		return quantidadeReservas;
+	}
+
+	public void setQuantidadeReservas(int quantidadeReservas) {
+		this.quantidadeReservas = quantidadeReservas;
+	}
+	
+	public void incrementarQuantidadeReservas() {
+        this.setQuantidadeReservas(this.getQuantidadeDisponivel() + 1);
+	}
+	
+	public void reduzirQuantidadeReservas() {
+        this.setQuantidadeReservas(this.getQuantidadeDisponivel() - 1);
+	}
 }
 
