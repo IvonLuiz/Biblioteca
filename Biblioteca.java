@@ -289,12 +289,23 @@ public class Biblioteca {
      }
 
     
-     private boolean verificarEntradas(Livro livro, Usuario usuario) {
-         if (usuario == null || livro == null) {
-             System.out.println("Usuário ou livro não encontrado.");
-             return false;
-         }
-         return true;
-     }
 
+
+	public void adicionarObservador(String codigoUsuario, String codigoLivro) {
+        Livro livro = buscarLivroPorCodigo(codigoLivro);
+        ObservadorLivro observador = (ObservadorLivro) buscarUsuarioPorCodigo(codigoUsuario);
+        
+        livro.adicionarObservador(observador);
+        System.out.println("Observador " + ((Usuario) observador).getNome() + " de " + livro.getTitulo() + " criado.");
+        
+	}
+
+    private boolean verificarEntradas(Livro livro, Usuario usuario) {
+        if (usuario == null || livro == null) {
+            System.out.println("Usuário ou livro não encontrado.");
+            return false;
+        }
+        return true;
+    }
+	
  }

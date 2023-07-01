@@ -90,9 +90,6 @@ public class Usuario {
 	}
 	
 	
-
-
-	
 	
 	public void setLimiteEmprestimos(int limiteEmprestimo) {
         this.limiteEmprestimo = limiteEmprestimo;

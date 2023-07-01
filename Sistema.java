@@ -42,6 +42,10 @@ public class Sistema {
     	biblioteca.removerUsuario(usuario);
     }
     
+	public void adicionarObservador(String observador, String livro) {
+		biblioteca.adicionarObservador(observador, livro);		
+	}
+    
     public List<Livro> buscarLivrosDisponiveis() {
         return biblioteca.buscarLivrosDisponiveis();
     }
@@ -89,8 +93,14 @@ public class Sistema {
 		case "res":
 			Sistema.getInstancia().realizarReserva(entrada[1], entrada[2]);
 			break;
+		
+		case "obs":
+			Sistema.getInstancia().adicionarObservador(entrada[1], entrada[2]);
+			break;
 		default:
 			System.out.println("Comando não identificado.");
 		}
 	}
+
+
 }

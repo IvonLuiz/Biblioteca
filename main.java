@@ -20,6 +20,7 @@ public class main {
         AlunoGraduacao usu2 = new AlunoGraduacao("456", "Luiz Fernando Rodrigues");
         AlunoGraduacao usu3 = new AlunoGraduacao("789", "Pedro Paulo");
         Professor usu4 = new Professor("100", "Carlos Lucena");
+        Professor usu5 = new Professor("101", "Ivon Monstro");
         
         sistema.adicionarLivro(livro1);
         sistema.adicionarLivro(livro2);
@@ -30,6 +31,7 @@ public class main {
         sistema.adicionarUsuario(usu2);
         sistema.adicionarUsuario(usu3);
         sistema.adicionarUsuario(usu4);
+        sistema.adicionarUsuario(usu5);
         /*
         while(true) {
         	String input = s.nextLine();
@@ -46,14 +48,13 @@ public class main {
         //sistema.realizarEmprestimo("123", "100");
         //sistema.realizarEmprestimo("123", "100");
  
+        sistema.adicionarObservador("100", "100");
         
         sistema.realizarReserva("123", "100");
-        sistema.realizarReserva("123", "101");
-        sistema.realizarReserva("123", "101");
-        sistema.realizarReserva("123", "200");
-        sistema.realizarReserva("123", "200");
-        sistema.realizarReserva("123", "300");
-        
+        sistema.realizarReserva("456", "100");
+        sistema.realizarReserva("789", "100");
+        sistema.adicionarObservador("101", "100");
+        sistema.realizarReserva("101", "100");
         /*
         sistema.realizarReserva("456", "100");
         sistema.realizarEmprestimo("100", "300");
