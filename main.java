@@ -39,7 +39,17 @@ public class main {
         	break;
     	}
             
+            
+            
+        
             */
+        
+        sistema.adicionarObservador("100", "300");
+        sistema.realizarReserva("100", "300");
+
+        sistema.realizarReserva("789", "300");
+        sistema.realizarReserva("101", "300");
+        sistema.printDadosObservador("100");
         
         // Realizar empréstimo
         //sistema.realizarReserva("456", "100");
@@ -48,14 +58,19 @@ public class main {
         //sistema.realizarEmprestimo("123", "100");
         //sistema.realizarEmprestimo("123", "100");
  
-        sistema.adicionarObservador("100", "100");
-        
-        sistema.realizarReserva("123", "100");
-        sistema.realizarReserva("456", "100");
-        sistema.realizarReserva("789", "100");
-        sistema.adicionarObservador("101", "100");
-        sistema.realizarReserva("101", "100");
         /*
+        sistema.realizarReserva("123", "100");
+        sistema.realizarReserva("123", "100");
+        sistema.realizarEmprestimo("123", "100");
+        sistema.realizarEmprestimo("123", "300");
+        sistema.realizarEmprestimo("123", "201");
+        sistema.realizarDevolucao("123", "100");
+        sistema.realizarReserva("123", "100");
+        sistema.realizarEmprestimo("123", "100");
+        sistema.realizarEmprestimo("123", "100");
+        sistema.realizarDevolucao("123", "300");
+        sistema.printDadosLivro("100");
+        
         sistema.realizarReserva("456", "100");
         sistema.realizarEmprestimo("100", "300");
         sistema.realizarEmprestimo("100", "300");

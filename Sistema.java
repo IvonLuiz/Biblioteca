@@ -97,10 +97,28 @@ public class Sistema {
 		case "obs":
 			Sistema.getInstancia().adicionarObservador(entrada[1], entrada[2]);
 			break;
+	
+		case "usu":
+			Sistema.getInstancia().printDadosUsuario(entrada[1]);
+		case "liv":
+			Sistema.getInstancia().printDadosLivro(entrada[1]);
+		case "ntf":
+			Sistema.getInstancia().printDadosObservador(entrada[1]);
+			
 		default:
 			System.out.println("Comando não identificado.");
 		}
 	}
 
+	public void printDadosUsuario(String codigoUsuario) {
+		biblioteca.getDadosUsuario(codigoUsuario);
+	}
+	public void printDadosLivro(String codigoLivro) {
+		biblioteca.getDadosLivro(codigoLivro);
+	}
 
+	public void printDadosObservador(String codigoUsuario) {
+		biblioteca.getDadosObservador(codigoUsuario);
+	}
+	
 }
