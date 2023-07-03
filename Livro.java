@@ -1,6 +1,5 @@
 package Biblioteca;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,6 +177,22 @@ public class Livro {
         }
         return false;
     }
+
+	public String getEditora() {
+		return editora;
+	}
+
+	public List<String> getAutores() {
+		return autores;
+	}
+
+	public int getEdicao() {
+		return edicao;
+	}
+
+	public int getAnoPublicacao() {
+		return anoPublicacao;
+	}
     
     
 }

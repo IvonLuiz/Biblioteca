@@ -9,7 +9,7 @@ public class Sistema {
 	private HashMap<String, Comando> comandos;
 	private Biblioteca biblioteca;
 	
-	public Sistema() {
+	private Sistema() {
         this.comandos = new HashMap<>();
         this.biblioteca = Biblioteca.getInstancia();
     }

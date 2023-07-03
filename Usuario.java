@@ -6,7 +6,6 @@ import java.util.HashMap;
 public class Usuario {
     private String codigo;
     private String nome;
-    private LocalDate dataDevolucao;
     private HashMap<String, LocalDate>  datasDevolucao;
     private HashMap<String, LocalDate>  datasAlugadas;
     private HashMap<String, LocalDate>  datasReservas;
@@ -40,28 +39,27 @@ public class Usuario {
             LocalDate dataDevolucao = datasDevolucao.get(codigoLivro);
             LocalDate dataAlugada = datasAlugadas.get(codigoLivro);
             
-            sb1.append("Título: ").append(codigoLivro)
+            sb1.append("\nTítulo: ").append(codigoLivro)
               .append(", Data de empréstimo: ").append(dataAlugada)
               .append(", Data limite de devolução: ").append(dataDevolucao)
-              .append(", Status empréstimo: ").append(verificarStatusString(codigoLivro))
-              .append('\n');
+              .append(", Status empréstimo: ").append(verificarStatusString(codigoLivro));
     	}
     	
     	for (String codigoLivro : datasReservas.keySet()) {
             LocalDate dataReserva = datasReservas.get(codigoLivro);
             
-            sb2.append("Título: ").append(codigoLivro)
+            sb2.append("\nTítulo: ").append(codigoLivro)
               .append(", Data de reserva: ").append(dataReserva);
-              }
+    	}
         
     	return "Usuario \n{\n" +
                 "Codigo = " + codigo + '\n' +
                 "Nome = " + nome + '\n' +
-                "Livro alugados:\n" + 
-                sb1 +
-                "Livros reservados:\n" +
-                sb2 +
-                "\n}";
+                "Livro alugados:" + 
+                sb1 + '\n' +
+                "Livros reservados:" +
+                sb2 + '\n' +
+                "}";
     }
     
     
@@ -143,9 +141,6 @@ public class Usuario {
 		return datasReservas.put(tituloLivro, LocalDate.now());
 	}
 
-	public void setDataDevolucao(LocalDate dataDevolucao) {
-		this.dataDevolucao = dataDevolucao;
-	}
 	
 	public LocalDate getDataDevolucao(String codigoLivro) {
 	    LocalDate dataDevolucao = datasDevolucao.get(codigoLivro);
