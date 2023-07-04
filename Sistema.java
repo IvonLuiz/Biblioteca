@@ -47,7 +47,9 @@ public class Sistema {
 	}
     
     public void buscarLivrosDisponiveis() {
-        biblioteca.printLivrosDisponiveis();
+        Comando comando = new ImprimirLivrosDisponiveis();
+        comandos.put("imprimirLivrosDisponiveis", comando);
+        comando.executar();
     }
 
     public void realizarEmprestimo(String codigoUsuario, String codigoLivro) {
@@ -68,7 +70,24 @@ public class Sistema {
         comando.executar();
     }
 
+	public void printDadosUsuario(String codigoUsuario) {
+		Comando comando = new ImprimirDadosUsuario(codigoUsuario);
+        comandos.put("imprimirDadosUsuario", comando);
+        comando.executar();
+	}
+	public void printDadosLivro(String codigoLivro) {
+		Comando comando = new ImprimirDadosLivro(codigoLivro);
+        comandos.put("imprimirDadosLivro", comando);
+        comando.executar();
+	}
 
+	public void printDadosObservador(String codigoObservador) {
+		Comando comando = new ImprimirDadosObservador(codigoObservador);
+        comandos.put("imprimirDadosObservador", comando);
+        comando.executar();
+	}
+	
+	
     public void desfazerUltimaOperacao() {
         if (!comandos.isEmpty()) {
             String ultimoComando = comandos.keySet().iterator().next();
@@ -121,17 +140,6 @@ public class Sistema {
 		default:
 			System.out.println("Comando não identificado.");
 		}
-	}
-
-	public void printDadosUsuario(String codigoUsuario) {
-		biblioteca.getDadosUsuario(codigoUsuario);
-	}
-	public void printDadosLivro(String codigoLivro) {
-		biblioteca.getDadosLivro(codigoLivro);
-	}
-
-	public void printDadosObservador(String codigoUsuario) {
-		biblioteca.getDadosObservador(codigoUsuario);
 	}
 	
 }
