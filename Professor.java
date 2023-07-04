@@ -23,4 +23,9 @@ public class Professor extends Usuario implements ObservadorLivro{
 	public int getQuantidadeNotificacoes() {
         return quantidadeNotificacoes;
 	}
+
+	@Override
+	public String toStringObs() {
+		return "Quantidade de vezes notificado por livros observados: " + getQuantidadeNotificacoes();
+	};
 }

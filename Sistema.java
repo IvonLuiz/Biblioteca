@@ -46,8 +46,8 @@ public class Sistema {
 		biblioteca.adicionarObservador(observador, livro);		
 	}
     
-    public List<Livro> buscarLivrosDisponiveis() {
-        return biblioteca.buscarLivrosDisponiveis();
+    public void buscarLivrosDisponiveis() {
+        biblioteca.printLivrosDisponiveis();
     }
 
     public void realizarEmprestimo(String codigoUsuario, String codigoLivro) {
@@ -100,11 +100,24 @@ public class Sistema {
 	
 		case "usu":
 			Sistema.getInstancia().printDadosUsuario(entrada[1]);
+			break;
 		case "liv":
 			Sistema.getInstancia().printDadosLivro(entrada[1]);
+			break;
 		case "ntf":
 			Sistema.getInstancia().printDadosObservador(entrada[1]);
+			break;
 			
+		case "dis":
+			Sistema.getInstancia().buscarLivrosDisponiveis();
+			break;
+		case "sai":
+			System.exit(0); // Finaliza o programa
+            break;
+		
+		case "undo":
+			Sistema.getInstancia().desfazerUltimaOperacao();
+			break;
 		default:
 			System.out.println("Comando não identificado.");
 		}

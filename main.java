@@ -2,6 +2,7 @@ package Biblioteca;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class main {
@@ -32,17 +33,16 @@ public class main {
         sistema.adicionarUsuario(usu3);
         sistema.adicionarUsuario(usu4);
         sistema.adicionarUsuario(usu5);
-        /*
+        
         while(true) {
         	String input = s.nextLine();
         	Sistema.lerComando(input);
-        	break;
     	}
             
             
             
         
-            */
+        /*
         sistema.realizarReserva("456", "100");
         sistema.realizarReserva("456", "100");
         
@@ -55,7 +55,7 @@ public class main {
         sistema.realizarReserva("100", "100");
         sistema.printDadosUsuario("456");
         sistema.printDadosLivro("100");
-        /*
+        
         sistema.adicionarObservador("100", "300");
         sistema.realizarReserva("457", "300");
 

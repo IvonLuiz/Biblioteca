@@ -12,15 +12,12 @@ public class Biblioteca {
 	private static Biblioteca uniqueInstance;
     private List<Livro> livros;
     private Map<String, Usuario> usuarios;
-    private Map<String, ArrayList<Livro>> reservas;
     private Verificacao estrategiaVerificacao;
 
     
     private Biblioteca() {
         this.livros = new ArrayList<>();
         this.usuarios = new HashMap<>();
-        this.reservas = new HashMap<String, ArrayList<Livro>>();
-
     }
 
     public static Biblioteca getInstancia() {
@@ -41,35 +38,36 @@ public class Biblioteca {
     public void adicionarUsuario(Usuario usuario) {
     	String codigo = usuario.getCodigo();
     	usuarios.put(codigo, usuario);
-
-        reservas.put(codigo, new ArrayList<Livro>());
     }
 
     public void removerUsuario(Usuario usuario) {
         String codigo = usuario.getCodigo();
     	usuarios.remove(codigo);
-
-        reservas.remove(codigo);
     }
     
     public void getDadosUsuario(String codigoUsuario) {
     	Usuario usu = buscarUsuarioPorCodigo(codigoUsuario);
+        if(!VerificadorEntradas.verificarUsuario(usu)) {
+        	return;
+        }
     	System.out.println(usu.toString());
     }
     
 	public void getDadosLivro(String codigoLivro) {
 		Livro livro = buscarLivroPorCodigo(codigoLivro);
-		
+        if(!VerificadorEntradas.verificarLivro(livro)) {
+        	return;
+        }
 		System.out.println(livro.toString());
 	}
 	
 	public void getDadosObservador(String codigoUsuario) {
 		ObservadorLivro observador = (ObservadorLivro) buscarUsuarioPorCodigo(codigoUsuario);
-		System.out.println("Quantidade de vezes notificado por livros observados: " + observador.getQuantidadeNotificacoes());	
+		System.out.println(observador.toStringObs());	
 	}
     
     // Buscas
-    public List<Livro> buscarLivrosDisponiveis() {
+    private List<Livro> buscarLivrosDisponiveis() {
         List<Livro> livrosDisponiveis = new ArrayList<>();
         for (Livro livro : livros) {
         	 if (livro.getQuantidadeDisponivel() > 0) {
@@ -79,6 +77,14 @@ public class Biblioteca {
          return livrosDisponiveis;
      }
 
+    public void printLivrosDisponiveis(){
+        List<Livro> livrosDisponiveis = buscarLivrosDisponiveis();
+        System.out.println("Livros disponíveis:");
+        for (Livro livro : livrosDisponiveis) {
+            System.out.println(livro.getTitulo());
+        }
+    }
+    
     private Livro buscarLivroPorCodigo(String codigoLivro) {
         for (Livro livro : livros) {
             if (livro.getCodigo().equals(codigoLivro)) {
@@ -92,17 +98,7 @@ public class Biblioteca {
     	return usuarios.get(codigoUsuario);
     }
 
-
-    
-    private Livro buscarReservaPorCodigo(String codigoUsuario, String codigoLivro) {
-        for (Livro livro : reservas.get(codigoUsuario)) {
-            if (livro.getCodigo().equals(codigoLivro)) {
-                return livro;
-            }
-        }
-        return null;
-	}
-    
+   
     
     // Reserva
     public void realizarReserva(String codigoUsuario, String codigoLivro) {
@@ -123,8 +119,6 @@ public class Biblioteca {
     	
     	livro.addReserva(usuario);
     	usuario.addReserva(livro.getTitulo());
-    	
-    	reservas.get(codigoUsuario).add(livro);
     	System.out.println("Reserva realizada com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
         
     }
@@ -138,8 +132,6 @@ public class Biblioteca {
         if(!VerificadorEntradas.verificarUsuarioELivro(usuario, livro)) {
         	return;
         }
-
-        reservas.get(codigoUsuario).remove(livro);
         livro.removeReserva(usuario);
         usuario.removeReserva(livro.getTitulo());
         
@@ -173,12 +165,14 @@ public class Biblioteca {
          
      private void emprestar(String codigoUsuario, String codigoLivro, Livro livro, Usuario usuario) {
 
+    	 // Adicionar um usuario que realizou empréstimo ao livro
          livro.addEmprestimo(usuario);
          
          // Calcular data de devolucao
          LocalDate dataAtual = LocalDate.now();
          LocalDate dataDevolucao = dataAtual.plusDays(usuario.getDiasEmprestimo());
          
+         // Adicionar data de devolucao ao usuario
          usuario.addDatasDevolucao(codigoLivro, dataDevolucao, dataAtual);
 
          if(livro.buscarReservaPorCodigo(codigoUsuario)) {
