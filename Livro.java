@@ -3,7 +3,7 @@ package Biblioteca;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Livro {
+public class Livro implements Sujeito{
 	private String codigo;
 	private String titulo;
 	private String editora;
@@ -13,7 +13,6 @@ public class Livro {
 	private int quantidadeDisponivel;
 	private int quantidadeReservas;
 	private List<ObservadorLivro> observadores;
-    private List<Usuario> usuariosReserva;
 	
 	
 	public Livro(String codigo, String titulo, String editora, List<String> autores, int edicao, int anoPublicacao, int quantidadeDisponivel) {
@@ -26,16 +25,13 @@ public class Livro {
         this.quantidadeDisponivel = quantidadeDisponivel;
         this.quantidadeReservas = 0;
         this.observadores = new ArrayList<>();
-        this.usuariosReserva = new ArrayList<Usuario>();
-        
 	}
 	
 	public String toString() {
         return  "Titulo = " + titulo + '\n' +	
         		"Codigo = " + codigo + '\n' +
                 "Status = " + getStatus() + '\n' +
-                "Quantidade de Reservas: " + quantidadeReservas + '\n' +
-                "Usuarios que reservaram: \n" + getReservas() + '\n';
+                "Quantidade de Reservas: " + quantidadeReservas + '\n';
     }
 
 	
@@ -74,25 +70,6 @@ public class Livro {
 	
 	
 	// Reservas
-	public void addReserva(Usuario usu) {
-		usuariosReserva.add(usu);
-		this.incrementarQuantidadeReservas();
-	}
-	
-	public void removeReserva(Usuario usu) {
-		usuariosReserva.remove(usu);
-		this.reduzirQuantidadeReservas();
-	}
-	
-	public String getReservas() {
-		String ret = "";
-		for (Usuario usu : usuariosReserva) {
-			ret += usu.getNome();
-			ret += " / ";
-		}
-		return ret;
-	}	
-	
 	public int getQuantidadeReservas() {
 		return quantidadeReservas;
 	}
@@ -115,32 +92,24 @@ public class Livro {
 	
 
 	// Observador
+	@Override
 	public void adicionarObservador(ObservadorLivro observador) {
         observadores.add(observador);
     }
 
+	@Override
     public void removerObservador(ObservadorLivro observador) {
         observadores.remove(observador);
     }
     
-    private void notificarObservadores() {
+	@Override
+    public void notificarObservadores() {
         for (ObservadorLivro observador : observadores) {
             observador.update(this, this.getQuantidadeReservas());
         }
     }
 
-    
-    // Buscar nas ArrayLists
-       
-    public boolean buscarReservaPorCodigo(String codigoUsuario) {
-        for (Usuario usu : usuariosReserva) {
-            if (usu.getCodigo().equals(codigoUsuario)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+   
 	public String getEditora() {
 		return editora;
 	}

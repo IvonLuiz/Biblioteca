@@ -14,7 +14,7 @@ public class VerificacaoEmprestimoComposta implements Verificacao{
 	        estrategias.add(new VerificacaoEmprestimoLivro());
 	        estrategias.add(new VerificacaoQuantidadeDisponivel());
 	        estrategias.add(new VerificacaoReserva());
-	    }
+	 }
 	
 	@Override
 	public boolean podeRealizarAcao(Usuario usuario, Livro livro) {

@@ -10,10 +10,9 @@ public class VerificacaoReserva implements Verificacao {
 	   		if (usuario.isPasseLivreEmprestimo()) {
 	          	 System.out.println("Usuario com passe livre detectado.");
 	           	 return true;
-	   		} else if (livro.buscarReservaPorCodigo(usuario.getCodigo()) == false) {  
-	   		
-	   		System.out.println("Não foi possível realizar o empréstimo. Livro indisponível: " + livro.getTitulo());
-	   	    return false;
+	   		} else if (Biblioteca.getInstancia().buscarReservaPorCodigoUsuarioLivro(usuario.getCodigo(), livro.getCodigo()) == null) {  
+	   			System.out.println("Não foi possível realizar o empréstimo. Livro indisponível: " + livro.getTitulo());
+	   			return false;
 	   		}
 	   	}
 		return true;

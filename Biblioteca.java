@@ -13,6 +13,7 @@ public class Biblioteca {
     private List<Livro> livros;
     private Map<String, Usuario> usuarios;
     private List<Emprestimo> emprestimos;
+    private List<Reserva> reservas;
     private Verificacao estrategiaVerificacao;
 
     
@@ -20,6 +21,7 @@ public class Biblioteca {
         this.livros = new ArrayList<>();
         this.usuarios = new HashMap<>();
         this.emprestimos = new ArrayList<>();
+        this.reservas = new ArrayList<>();
     }
 
     public static Biblioteca getInstancia() {
@@ -52,15 +54,25 @@ public class Biblioteca {
         if(!VerificadorEntradas.verificarUsuario(usuario)) {
         	return;
         }
-        String ret = "Usuario \n{\n";
+        String ret = "Usuario: \n{\n";
         ret += usuario.toString();
-		ret += "\nLivros alugados: \n" ;
+        
+        ret += "Livros reservados: \n";
+        
+        for (Reserva reserva : buscarReservasPorCodigoUsuario(codigoUsuario)) {
+			ret += reserva.getLivro().getTitulo() + 
+					" - Reservado em: " + reserva.dataReserva();
+			ret += "\n";
+        }
+        
+        
+		ret += "Livros alugados: \n" ;
         for (Emprestimo emprestimo : buscarEmprestimosPorCodigoUsuario(codigoUsuario)) {
 
   			ret += "Titulo: " + emprestimo.getLivro().getTitulo() + 
   					" - Alugado em: " + emprestimo.getDataAlugado() + 
   					" - Data limite retorno: " + emprestimo.getDataDevolucao() + 
-  					" Status empréstimo: " + emprestimo.verificarAtrasoString();
+  					" - Status: " + emprestimo.verificarAtrasoString();
   			ret += "\n";
           }
             	
@@ -70,15 +82,23 @@ public class Biblioteca {
     
     
     
-    
 	public void getDadosLivro(String codigoLivro) {
 		Livro livro = buscarLivroPorCodigo(codigoLivro);
         if(!VerificadorEntradas.verificarLivro(livro)) {
         	return;
         }
-        String ret = "Livro: \n{";
+        String ret = "Livro: \n{\n";
         ret += livro.toString();
-		ret += "Usuarios que estão alugando: \n" ;
+		
+        ret += "Usuarios que reservaram: \n";
+        
+        for (Reserva reserva : buscarReservasPorCodigoLivro(codigoLivro)) {
+			ret += reserva.getUsuario().getNome() + 
+					" - Reservado em: " + reserva.dataReserva();
+			ret += "\n";
+        }
+        
+        ret += "Usuarios que estão alugando: \n" ;
         
         for (Emprestimo emprestimo : buscarEmprestimosPorCodigoLivro(codigoLivro)) {
 			ret += emprestimo.getUsuario().getNome() + 
@@ -90,29 +110,14 @@ public class Biblioteca {
         System.out.println(ret);
 	}
 	
+	
+	
 	public void getDadosObservador(String codigoUsuario) {
 		ObservadorLivro observador = (ObservadorLivro) buscarUsuarioPorCodigo(codigoUsuario);
 		System.out.println(observador.toStringObs());	
 	}
     
     // Buscas
-    private List<Livro> buscarLivrosDisponiveis() {
-        List<Livro> livrosDisponiveis = new ArrayList<>();
-        for (Livro livro : livros) {
-        	 if (livro.getQuantidadeDisponivel() > 0) {
-                 livrosDisponiveis.add(livro);
-             }
-         }
-         return livrosDisponiveis;
-     }
-
-    public void printLivrosDisponiveis(){
-        List<Livro> livrosDisponiveis = buscarLivrosDisponiveis();
-        System.out.println("Livros disponíveis:");
-        for (Livro livro : livrosDisponiveis) {
-            System.out.println(livro.getTitulo());
-        }
-    }
 
     private Livro buscarLivroPorCodigo(String codigoLivro) {
         for (Livro livro : livros) {
@@ -163,6 +168,66 @@ public class Biblioteca {
         return emprestimosDoLivro;
     }
     
+    
+    
+
+    public List<Reserva> buscarReservasPorCodigoUsuario(String codigoUsuario) {
+    	List<Reserva> reservasDoUsuario = new ArrayList<>();
+    	
+    	// Loop retorna todos as reservas do Usuario
+    	for (Reserva reserva : reservas) {
+            if (reserva.getUsuario().getCodigo() == codigoUsuario) {
+            	reservasDoUsuario.add(reserva);
+            }
+        }
+        return reservasDoUsuario;
+    }
+    
+    public List<Reserva> buscarReservasPorCodigoLivro(String codigoLivro) {
+    	List<Reserva> reservasDoLivro = new ArrayList<>();
+    	
+    	// Loop retorna todos as reservas do Livro
+    	for (Reserva reserva : reservas) {
+            if (reserva.getLivro().getCodigo() == codigoLivro) {
+            	reservasDoLivro.add(reserva);
+            }
+        }
+        return reservasDoLivro;
+    }
+    
+    public Reserva buscarReservaPorCodigoUsuarioLivro(String codigoUsuario, String codigoLivro) {
+    	
+    	// Loop retorna reserva específica de um Usuario de um livro
+    	for (Reserva reserva : reservas) {
+            if (reserva.getUsuario().getCodigo() == codigoUsuario && reserva.getLivro().getCodigo() == codigoLivro) {
+            	return reserva;
+            }
+        }
+        return null;
+    }
+
+    
+   
+    
+    private List<Livro> buscarLivrosDisponiveis() {
+        List<Livro> livrosDisponiveis = new ArrayList<>();
+        for (Livro livro : livros) {
+        	 if (livro.getQuantidadeDisponivel() > 0) {
+                 livrosDisponiveis.add(livro);
+             }
+         }
+         return livrosDisponiveis;
+     }
+
+    public void printLivrosDisponiveis(){
+        List<Livro> livrosDisponiveis = buscarLivrosDisponiveis();
+        System.out.println("Livros disponíveis:");
+        for (Livro livro : livrosDisponiveis) {
+            System.out.println(livro.getTitulo());
+        }
+    }
+
+    
     // Reserva
     public void realizarReserva(String codigoUsuario, String codigoLivro) {
         Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
@@ -179,9 +244,11 @@ public class Biblioteca {
        	 return;
         }
         
+    	Reserva reserva = new Reserva(usuario, livro);
+    	reservas.add(reserva);
+    	usuario.incrementarQuantLivrosReservados();
+    	livro.incrementarQuantidadeReservas();
     	
-    	livro.addReserva(usuario);
-    	usuario.addReserva(livro.getTitulo());
     	System.out.println("Reserva realizada com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
         
     }
@@ -195,8 +262,16 @@ public class Biblioteca {
         if(!VerificadorEntradas.verificarUsuarioELivro(usuario, livro)) {
         	return;
         }
-        livro.removeReserva(usuario);
-        usuario.removeReserva(livro.getTitulo());
+        
+        Reserva reserva = buscarReservaPorCodigoUsuarioLivro(codigoUsuario, codigoLivro);
+        if(reserva == null) {
+        	System.out.println("Usuario não possui reserva deste item.");
+        	return;
+   	 	}
+        
+        reservas.remove(reserva);
+        livro.reduzirQuantidadeReservas();
+        usuario.decrementarQuantLivrosReservados();
         
         System.out.println("Reserva desfeita: " + codigoUsuario + " -> " + livro.getTitulo());        
     }
@@ -233,10 +308,9 @@ public class Biblioteca {
     	 emprestimos.add(emprestimo);
     	 usuario.incrementarQuantLivrosEmprestados();
     	 livro.decrementarQuantidadeDisponivel();
-
-         if(livro.buscarReservaPorCodigo(codigoUsuario)) {
-    		 desfazerReserva(codigoUsuario, codigoLivro); // Remover reserva, se existir
-    	 }
+    	 
+    	 // Desfaz reserva se existir
+  		 desfazerReserva(codigoUsuario, codigoLivro); // Remover reserva, se existir
          
          System.out.println("Empréstimo realizado com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
          System.out.println("Data de devolução: " + emprestimo.getDataDevolucao());
