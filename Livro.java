@@ -14,8 +14,6 @@ public class Livro {
 	private int quantidadeReservas;
 	private List<ObservadorLivro> observadores;
     private List<Usuario> usuariosReserva;
-    private List<Usuario> usuariosEmprestimos;
-    
 	
 	
 	public Livro(String codigo, String titulo, String editora, List<String> autores, int edicao, int anoPublicacao, int quantidadeDisponivel) {
@@ -29,18 +27,15 @@ public class Livro {
         this.quantidadeReservas = 0;
         this.observadores = new ArrayList<>();
         this.usuariosReserva = new ArrayList<Usuario>();
-        this.usuariosEmprestimos = new ArrayList<Usuario>();
-    }
+        
+	}
 	
 	public String toString() {
-        return "Livro \n{\n" +
-                "Codigo = " + codigo + '\n' +
-                "Titulo = " + titulo + '\n' +
+        return  "Titulo = " + titulo + '\n' +	
+        		"Codigo = " + codigo + '\n' +
                 "Status = " + getStatus() + '\n' +
                 "Quantidade de Reservas: " + quantidadeReservas + '\n' +
-                "Usuarios que reservaram: \n" + getReservas() + '\n' +
-                "Usuarios que estão alugando: \n" + getEmprestimos() +
-                '}';
+                "Usuarios que reservaram: \n" + getReservas() + '\n';
     }
 
 	
@@ -66,7 +61,7 @@ public class Livro {
         this.setQuantidadeDisponivel(this.getQuantidadeDisponivel() + 1);
 	}
 	
-	public void reduzirQuantidadeDisponivel() {
+	public void decrementarQuantidadeDisponivel() {
         this.setQuantidadeDisponivel(this.getQuantidadeDisponivel() - 1);
 	}
 	
@@ -118,30 +113,6 @@ public class Livro {
 	}
 	
 	
-	
-	// Emprestimos
-	public void addEmprestimo(Usuario usu) {
-		usuariosEmprestimos.add(usu);
-		this.reduzirQuantidadeDisponivel();;
-	}
-	
-	public void removeEmprestimo(Usuario usu) {
-		usuariosEmprestimos.remove(usu);
-		this.incrementarQuantidadeDisponivel();
-	}
-	
-	public String getEmprestimos() {
-		String ret = "";
-		for (Usuario usu : usuariosEmprestimos) {
-			ret += usu.getNome();
-			ret += " alugado em: " + usu.getDataAluguel(this.getCodigo());
-			ret += " data limite retorno: " + usu.getDataDevolucao(this.getCodigo());
-			ret += "\n";
-			
-		}
-		return ret;
-	}
-	
 
 	// Observador
 	public void adicionarObservador(ObservadorLivro observador) {
@@ -160,15 +131,7 @@ public class Livro {
 
     
     // Buscar nas ArrayLists
-    public boolean buscarEmprestimoPorCodigo(String codigoUsuario) {
-        for (Usuario usu : usuariosEmprestimos) {
-            if (usu.getCodigo().equals(codigoUsuario)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
+       
     public boolean buscarReservaPorCodigo(String codigoUsuario) {
         for (Usuario usu : usuariosReserva) {
             if (usu.getCodigo().equals(codigoUsuario)) {

@@ -6,14 +6,13 @@ import java.util.HashMap;
 public class Usuario {
     private String codigo;
     private String nome;
-    private HashMap<String, LocalDate>  datasDevolucao;
-    private HashMap<String, LocalDate>  datasAlugadas;
+    private boolean atrasado;
     private HashMap<String, LocalDate>  datasReservas;
     private int quantLivrosEmprestados;
     private int quantLivrosReservados;
-	private int limiteEmprestimo;
-	private int limiteReservas;
-    private int diasEmprestimo;
+	private int limiteEmprestimo;							// Quantidade limite de livros		 
+	private int limiteReservas;								// Quantidade limite de reservas
+    private int diasEmprestimo;								// Quantidade limite de dias que pode alugar
     private boolean passeLivreEmprestimo;
     
     public Usuario(String codigo, String nome) {
@@ -25,26 +24,14 @@ public class Usuario {
         this.limiteReservas = 3;
         this.diasEmprestimo = 7;
         this.setPasseLivreEmprestimo(false);
-        this.datasDevolucao = new HashMap<String, LocalDate>();
-        this.datasAlugadas = new HashMap<String, LocalDate>();
+        this.atrasado = false;
         this.datasReservas = new HashMap<String, LocalDate>();
     }
 
     @Override
     public String toString() {
-        StringBuilder sb1 = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
-        
-    	for (String codigoLivro : datasDevolucao.keySet()) {
-            LocalDate dataDevolucao = datasDevolucao.get(codigoLivro);
-            LocalDate dataAlugada = datasAlugadas.get(codigoLivro);
-            
-            sb1.append("\nTítulo: ").append(codigoLivro)
-              .append(", Data de empréstimo: ").append(dataAlugada)
-              .append(", Data limite de devolução: ").append(dataDevolucao)
-              .append(", Status empréstimo: ").append(verificarStatusString(codigoLivro));
-    	}
-    	
+  
     	for (String codigoLivro : datasReservas.keySet()) {
             LocalDate dataReserva = datasReservas.get(codigoLivro);
             
@@ -52,36 +39,19 @@ public class Usuario {
               .append(", Data de reserva: ").append(dataReserva);
     	}
         
-    	return "Usuario \n{\n" +
+    	return	"Nome = " + nome + '\n' +
                 "Codigo = " + codigo + '\n' +
-                "Nome = " + nome + '\n' +
-                "Livro alugados:" + 
-                sb1 + '\n' +
                 "Livros reservados:" +
-                sb2 + '\n' +
-                "}";
+                sb2 + '\n';
+    }
+    
+    public boolean verificarAtraso() {
+    	return this.atrasado;
     }
     
     
-    public boolean verificarAtrasoDevolucao() {
-    	for (String codigoLivro : datasDevolucao.keySet()) {
-			verificarAtrasoIndividual(codigoLivro);
-			return false;
-    	}
-    	return false;
-    }
-    
-    private boolean verificarAtrasoIndividual(String codigoLivro) {
-    	if (getDataDevolucao(codigoLivro) != null) {
-    		LocalDate data = LocalDate.now();
-    		return data.isAfter(getDataDevolucao(codigoLivro));
-    	}
-    	return false;
-    }
-    
-    
-    private String verificarStatusString(String codigoLivro) {
-    	if (verificarAtrasoIndividual(codigoLivro)) {
+    public String verificarStatusString() {
+    	if (verificarAtraso()) {
     		return "atrasado";
     	}
     	return "em curso";
@@ -141,31 +111,7 @@ public class Usuario {
 		return datasReservas.put(tituloLivro, LocalDate.now());
 	}
 
-	
-	public LocalDate getDataDevolucao(String codigoLivro) {
-	    LocalDate dataDevolucao = datasDevolucao.get(codigoLivro);
-	    return dataDevolucao;
-	}
-	
-	public LocalDate getDataAluguel(String codigoLivro) {
-		LocalDate dataAlugada = datasAlugadas.get(codigoLivro);
-		return dataAlugada;
-	}
 
-	
-	public void addDatasDevolucao(String codigoLivro, LocalDate dataDevolucao, LocalDate dataAtual) {
-		datasDevolucao.put(codigoLivro, dataDevolucao);
-		datasAlugadas.put(codigoLivro, dataAtual);
-        incrementarQuantLivrosEmprestados();
-	}
-	
-	public void removeDatasDevolucao(String codigoLivro) {
-		datasDevolucao.remove(codigoLivro);
-	}
-
-
-	
-	
 	public void setLimiteEmprestimos(int limiteEmprestimo) {
         this.limiteEmprestimo = limiteEmprestimo;
     }

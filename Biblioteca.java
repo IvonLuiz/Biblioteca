@@ -5,19 +5,21 @@ import java.util.Map;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.time.temporal.ChronoUnit;
 
 public class Biblioteca {
 	
 	private static Biblioteca uniqueInstance;
     private List<Livro> livros;
     private Map<String, Usuario> usuarios;
+    private List<Emprestimo> emprestimos;
     private Verificacao estrategiaVerificacao;
 
     
     private Biblioteca() {
         this.livros = new ArrayList<>();
         this.usuarios = new HashMap<>();
+        this.emprestimos = new ArrayList<>();
     }
 
     public static Biblioteca getInstancia() {
@@ -46,19 +48,46 @@ public class Biblioteca {
     }
     
     public void getDadosUsuario(String codigoUsuario) {
-    	Usuario usu = buscarUsuarioPorCodigo(codigoUsuario);
-        if(!VerificadorEntradas.verificarUsuario(usu)) {
+    	Usuario usuario = buscarUsuarioPorCodigo(codigoUsuario);
+        if(!VerificadorEntradas.verificarUsuario(usuario)) {
         	return;
         }
-    	System.out.println(usu.toString());
+        String ret = "Usuario \n{\n";
+        ret += usuario.toString();
+		ret += "\nLivros alugados: \n" ;
+        for (Emprestimo emprestimo : buscarEmprestimosPorCodigoUsuario(codigoUsuario)) {
+
+  			ret += "Titulo: " + emprestimo.getLivro().getTitulo() + 
+  					" - Alugado em: " + emprestimo.getDataAlugado() + 
+  					" - Data limite retorno: " + emprestimo.getDataDevolucao() + 
+  					" Status empréstimo: " + emprestimo.verificarAtrasoString();
+  			ret += "\n";
+          }
+            	
+        ret += "}";
+    	System.out.println(ret);
     }
+    
+    
+    
     
 	public void getDadosLivro(String codigoLivro) {
 		Livro livro = buscarLivroPorCodigo(codigoLivro);
         if(!VerificadorEntradas.verificarLivro(livro)) {
         	return;
         }
-		System.out.println(livro.toString());
+        String ret = "Livro: \n{";
+        ret += livro.toString();
+		ret += "Usuarios que estão alugando: \n" ;
+        
+        for (Emprestimo emprestimo : buscarEmprestimosPorCodigoLivro(codigoLivro)) {
+			ret += emprestimo.getUsuario().getNome() + 
+					" - Alugado em: " + emprestimo.getDataAlugado() + 
+					" - Data limite retorno: " + emprestimo.getDataDevolucao();
+			ret += "\n";
+        }
+        ret += "}";
+        System.out.println(ret);
 	}
 	
 	public void getDadosObservador(String codigoUsuario) {
@@ -84,7 +113,7 @@ public class Biblioteca {
             System.out.println(livro.getTitulo());
         }
     }
-    
+
     private Livro buscarLivroPorCodigo(String codigoLivro) {
         for (Livro livro : livros) {
             if (livro.getCodigo().equals(codigoLivro)) {
@@ -98,7 +127,41 @@ public class Biblioteca {
     	return usuarios.get(codigoUsuario);
     }
 
-   
+    public List<Emprestimo> buscarEmprestimosPorCodigoUsuario(String codigoUsuario) {
+    	List<Emprestimo> emprestimosDoUsuario = new ArrayList<>();
+    	
+    	// Loop retorna todos os emprestimos do Usuario
+    	for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.getUsuario().getCodigo() == codigoUsuario) {
+            	emprestimosDoUsuario.add(emprestimo);
+            }
+        }
+        return emprestimosDoUsuario;
+    }
+    
+    
+    public Emprestimo buscarEmprestimoPorCodigoUsuarioLivro(String codigoUsuario, String codigoLivro) {
+    	
+    	// Loop retorna empréstimo específico de um Usuario de um livro
+    	for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.getUsuario().getCodigo() == codigoUsuario && emprestimo.getLivro().getCodigo() == codigoLivro) {
+            	return emprestimo;
+            }
+        }
+        return null;
+    }
+    
+    public List<Emprestimo> buscarEmprestimosPorCodigoLivro(String codigoLivro) {
+    	List<Emprestimo> emprestimosDoLivro = new ArrayList<>();
+    	
+    	// Loop retorna todos os emprestimos do Livro
+    	for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.getLivro().getCodigo() == codigoLivro) {
+            	emprestimosDoLivro.add(emprestimo);
+            }
+        }
+        return emprestimosDoLivro;
+    }
     
     // Reserva
     public void realizarReserva(String codigoUsuario, String codigoLivro) {
@@ -166,21 +229,17 @@ public class Biblioteca {
      private void emprestar(String codigoUsuario, String codigoLivro, Livro livro, Usuario usuario) {
 
     	 // Adicionar um usuario que realizou empréstimo ao livro
-         livro.addEmprestimo(usuario);
-         
-         // Calcular data de devolucao
-         LocalDate dataAtual = LocalDate.now();
-         LocalDate dataDevolucao = dataAtual.plusDays(usuario.getDiasEmprestimo());
-         
-         // Adicionar data de devolucao ao usuario
-         usuario.addDatasDevolucao(codigoLivro, dataDevolucao, dataAtual);
+    	 Emprestimo emprestimo = new Emprestimo(usuario, livro); 
+    	 emprestimos.add(emprestimo);
+    	 usuario.incrementarQuantLivrosEmprestados();
+    	 livro.decrementarQuantidadeDisponivel();
 
          if(livro.buscarReservaPorCodigo(codigoUsuario)) {
     		 desfazerReserva(codigoUsuario, codigoLivro); // Remover reserva, se existir
     	 }
          
          System.out.println("Empréstimo realizado com sucesso: " + usuario.getNome() + " - " + livro.getTitulo());
-         System.out.println("Data de devolução: " + dataDevolucao);
+         System.out.println("Data de devolução: " + emprestimo.getDataDevolucao());
      }
 
 
@@ -193,16 +252,15 @@ public class Biblioteca {
          	return;
          }
          
-         if (!(livro.buscarEmprestimoPorCodigo(codigoUsuario))) {
+         Emprestimo emprestimo = buscarEmprestimoPorCodigoUsuarioLivro(codigoUsuario, codigoLivro);
+         if (emprestimo == null) {
         	 System.out.println("Usuário não possui empréstimo para determinado livro.");
         	 return;
          }
          
-         
-         livro.removeEmprestimo(usuario);
-         usuario.removeDatasDevolucao(codigoLivro);
-
-         
+         emprestimos.remove(emprestimo);
+         usuario.decrementarQuantLivrosEmprestados();
+         livro.incrementarQuantidadeDisponivel();
 
          System.out.println("Devolução de " + usuario.getNome() + " realizada com sucesso: " + livro.getTitulo());
      }
@@ -227,6 +285,18 @@ public class Biblioteca {
 
 	public void setEstrategiaVerificacao(Verificacao estrategiaVerificacao) {
 		this.estrategiaVerificacao = estrategiaVerificacao;
+	}
+	
+	
+	// Verifica se o usuario esta com algum emprestimo atrasado, retorta true se estiver pelo menos um atrasado, false caso contrario
+	public boolean verificarAtrasoDevolucaoUsuario(String codigoUsuario) {
+		List<Emprestimo> emprestimos = buscarEmprestimosPorCodigoUsuario(codigoUsuario);
+		for (Emprestimo emp : emprestimos) {
+			if (emp.verificarAtraso()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
  }

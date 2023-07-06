@@ -33,29 +33,31 @@ public class main {
         sistema.adicionarUsuario(usu3);
         sistema.adicionarUsuario(usu4);
         sistema.adicionarUsuario(usu5);
-        
+        /*
         while(true) {
         	String input = s.nextLine();
         	Sistema.lerComando(input);
     	}
             
-            
+            */
             
         
-        /*
+        
         sistema.realizarReserva("456", "100");
         sistema.realizarReserva("456", "100");
         
         sistema.realizarReserva("456", "300");
-        sistema.realizarReserva("456", "201");
-        sistema.realizarReserva("456", "101");
-        
+        sistema.realizarReserva("789", "300");
         sistema.realizarEmprestimo("456", "100");
         sistema.realizarEmprestimo("789", "100");
+
+        sistema.realizarEmprestimo("789", "200");
+        sistema.realizarEmprestimo("789", "201");
+        sistema.realizarEmprestimo("789", "101");
         sistema.realizarReserva("100", "100");
-        sistema.printDadosUsuario("456");
+        sistema.printDadosUsuario("789");
         sistema.printDadosLivro("100");
-        
+        /*
         sistema.adicionarObservador("100", "300");
         sistema.realizarReserva("457", "300");
 
