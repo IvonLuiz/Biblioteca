@@ -43,7 +43,9 @@ public class Sistema {
     }
     
 	public void adicionarObservador(String observador, String livro) {
-		biblioteca.adicionarObservador(observador, livro);		
+		Comando comando = new AdicionarObservador(observador, livro);
+		comandos.put("adicionarObservador", comando);
+		comando.executar();
 	}
     
     public void buscarLivrosDisponiveis() {
